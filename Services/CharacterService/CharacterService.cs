@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using dotnet_rpg.Dtos.Fight;
 using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_rpg.Services.CharacterService
@@ -87,8 +88,17 @@ namespace dotnet_rpg.Services.CharacterService
                 .Include(c => c.Weapon)
                 .Include(c => c.Skills)
                 .FirstOrDefaultAsync(c => c.Id == id && c.User != null && c.User.Id == GetUserId());
-                serviceResponse.Data =  _mapper.Map<GetCharacterDto>(DBcharacter);
-                return serviceResponse;  
+            serviceResponse.Data =  _mapper.Map<GetCharacterDto>(DBcharacter);
+            return serviceResponse;  
+        }
+
+        public async Task<ServiceResponse<GetOpponentDto>> GetOpponentById(int id)
+        {
+            var serviceResponse  = new ServiceResponse<GetOpponentDto>();
+            var DBcharacter = await _context.Characters
+                .FirstOrDefaultAsync(c => c.Id == id);
+            serviceResponse.Data =  _mapper.Map<GetOpponentDto>(DBcharacter);
+            return serviceResponse;  
         }
 
         public async Task<ServiceResponse<GetCharacterDto>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
@@ -165,6 +175,30 @@ namespace dotnet_rpg.Services.CharacterService
                 response.Message = ex.Message;
             }
 
+            return response;
+        }
+
+        public async Task<ServiceResponse<GetOpponentDto>> DamageOpponent(DamageOpponentDto damageOpponent)
+        {
+            var response = new ServiceResponse<GetOpponentDto>();
+            try
+            {
+            var opponent = await _context.Characters.FirstOrDefaultAsync(C => C.Id == damageOpponent.OpponentId);
+
+            if(opponent is null)
+                throw new Exception($"Character with id {damageOpponent.OpponentId} was not found.");
+
+            int newHitPoints = opponent.HitPoints - damageOpponent.Damage;
+            opponent.HitPoints = newHitPoints > 0 ? newHitPoints : 0;
+            await _context.SaveChangesAsync();
+
+            response.Data = _mapper.Map<GetOpponentDto>(opponent);
+            }
+            catch(Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
             return response;
         }
     }

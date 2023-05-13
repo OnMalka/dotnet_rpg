@@ -9,5 +9,6 @@ namespace dotnet_rpg.Dtos.Skill
     {
         public string Name { get; set; } = string.Empty;
         public int Damage { get; set; }
+        public int Id { get; internal set; }
     }
 }

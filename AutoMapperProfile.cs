@@ -12,6 +12,7 @@ namespace dotnet_rpg
         public AutoMapperProfile()
         {
             CreateMap<Character, GetCharacterDto>();
+            CreateMap<Character, GetOpponentDto>();
             CreateMap<AddCharacterDto, Character>();
             CreateMap<AddWeaponDto, Weapon>();
             CreateMap<Weapon, GetWeaponDto>();
