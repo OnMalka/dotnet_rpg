@@ -23,8 +23,7 @@ namespace dotnet_rpg.Controllers
         // [AllowAnonymous] to make a single route not require authorization
         [HttpGet("GetAll")]
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Get() {
-            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            return Ok(await _characterService.GetAllCharacters(userId));
+            return Ok(await _characterService.GetAllCharacters());
         }
         // [Authorize] to make a single route require authorization
         [HttpGet("{id}")]
@@ -50,6 +49,11 @@ namespace dotnet_rpg.Controllers
             if(response.Data is null)
                 return NotFound(response);
             return Ok(response);
+        }
+        [HttpPost("Skill")]
+        public async Task<ActionResult<ServiceResponse<GetCharacterDto>>> AddCharacterSkill(
+            AddCharacterSkillDto newCharacterSkill) {
+            return Ok(await _characterService.AddCharacterSkill(newCharacterSkill));
         }
     }
 }
